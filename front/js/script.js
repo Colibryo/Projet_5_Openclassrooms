@@ -10,9 +10,9 @@ class Products {
  * prend en paramètres le résultat
  * retourne le résultat en cas de succès ou indique un message d'erreur*/
 fetch("http://localhost:3000/api/products")
-       .then(res => {
-              if (res.ok) {
-                     return res.json();
+       .then(response => {
+              if (response.ok) {
+                     return response.json();
               }
               throw new Error('Erreur serveur');
 
@@ -23,7 +23,7 @@ fetch("http://localhost:3000/api/products")
        .then(ProductsJson => {
               for (let jsonProduct of ProductsJson) {
                      let product = new Products(jsonProduct)
-                     document.getElementById('items').innerHTML += `<a href="./product.html?${product._id}">
+                     document.getElementById('items').innerHTML += `<a href="./product.html?idProduct=${product._id}">
                                                         <article>
                                                                <img src="${product.imageUrl}" alt="${product.altTxt}">
                                                                <h3 class="productName">${product.name}</h3>
