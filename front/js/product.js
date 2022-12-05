@@ -40,7 +40,8 @@ fetch(`http://localhost:3000/api/products/${id}`)
                      localStorage.setItem('basket', JSON.stringify(tableBasket));
               }
 
-              //fonction qui crée le panier dans le localStorage s'il n'existe pas sinon elle récupère les données du panier qu'elle transorme au format json   
+              /*fonction qui crée le panier dans le localStorage s'il n'existe pas 
+              sinon récupère les données du panier */  
               function getBasket() {
                      let tableBasket = localStorage.getItem('basket');
 
@@ -61,26 +62,31 @@ fetch(`http://localhost:3000/api/products/${id}`)
               function addProduct() {
 
                      let tableBasket = getBasket();
-                     let searchProduct = tableBasket.find(element => element.id === ProductJson._id & element.color === colors.value);
+                     let searchProduct = tableBasket.find(element => element._id === ProductJson._id & element.color === colors.value);
 
                      if (searchProduct != undefined) {
-
+                             // ajout du produit avec une quantité limitée à 100
                             let newQuantity = parseInt(quantity.value) + parseInt(searchProduct.quantity)
-
+                            if (newQuantity <= 100) {
                             let newProduct = {
-                                   id: ProductJson._id,
+                                   _id: ProductJson._id,
                                    color: colors.value,
                                    quantity: parseInt(newQuantity)
+                                   }
+                            //substitue le produit par l'index afin de conserver l'ordre des commandes
+                            let indexProduct = tableBasket.indexOf(searchProduct)
+                            tableBasket.splice(indexProduct,1, newProduct)
+                            setBasket(tableBasket);
+                            }//sinon message si la quantité de 100 est dépassée 
+                            else {
+                                   alert("Quantité maximale dépassée!")
                             }
 
-                            let newTableBasket = tableBasket.filter(element => element.id !== ProductJson._id || element.color !== colors.value);
-                            newTableBasket.push(newProduct)
-                            setBasket(newTableBasket);
                      }
 
                      else {
                             const productBasket = {
-                                   id: ProductJson._id,
+                                   _id: ProductJson._id,
                                    color: colors.value,
                                    quantity: parseInt(quantity.value)
                             }
@@ -89,11 +95,24 @@ fetch(`http://localhost:3000/api/products/${id}`)
                             setBasket(tableBasket);
                      }
               }
-              //fonction qui, au click sur le bouton, ajoute le ou les produits au panier
+
+              /*fonction pour ajouter le ou les produits au panier en cliquant sur le bouton, avec
+              messages à l'utilisateur si la couleur et la quantité sont mal renseignées*/
               const bouton = document.querySelector('#addToCart');
               bouton.addEventListener('click', () => {
-                     addProduct();
 
+                     let selectElem = document.querySelector("#colors")
+                     let firstOption = selectElem.selectedIndex;
+                     
+                     if (colors.value == firstOption) {
+                            alert("Merci d'indiquer une couleur");
+                     }
+                     
+                     else if (quantity.value == 0) {
+                            alert("Merci d'indiquer un nombre d'article(s) entre 1 et 100");
+                     }
+                     else {
+                            addProduct()
+                     }
               })
-
        })
