@@ -79,7 +79,7 @@ fetch(`http://localhost:3000/api/products/${id}`)
                             setBasket(tableBasket);
                             }//sinon message si la quantité de 100 est dépassée 
                             else {
-                                   alert("Quantité maximale dépassée!")
+                                   alert("Vous dépassez la quantité maximale autorisée de 100 canapés! Merci de choisir une nouvelle quantité")
                             }
 
                      }
@@ -98,8 +98,8 @@ fetch(`http://localhost:3000/api/products/${id}`)
 
               /*fonction pour ajouter le ou les produits au panier en cliquant sur le bouton, avec
               messages à l'utilisateur si la couleur et la quantité sont mal renseignées*/
-              const bouton = document.querySelector('#addToCart');
-              bouton.addEventListener('click', () => {
+              const button = document.querySelector('#addToCart');
+              button.addEventListener('click', () => {
 
                      let selectElem = document.querySelector("#colors")
                      let firstOption = selectElem.selectedIndex;
@@ -113,6 +113,7 @@ fetch(`http://localhost:3000/api/products/${id}`)
                      }
                      else {
                             addProduct()
+                            location.replace("http://127.0.0.1:5500/front/html/index.html")
                      }
               })
        })
