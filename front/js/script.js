@@ -30,10 +30,12 @@ fetch("http://localhost:3000/api/products")
                      let title = document.createElement('h3');
                      title.textContent = `${jsonProduct.name}`
                      article.appendChild(title);
+                     title.className = 'productName'
                      
                      let description = document.createElement('p');
                      description.textContent = `${jsonProduct.description}`
                      article.appendChild(description);
+                     description.className = 'productDescription'
 
               }
 
