@@ -29,67 +29,66 @@ function totalPrice(tablePrice) {
 
 //fonction pour afficher toutes les données des produits fusionnés pris en paramètres 
 let totalPriceProduct = 0;
-let tablePrice = []
-
+let tablePrice = [];
 function displayDataBasket(mergeProduct) {
 
-  totalPriceProduct = priceMergeProducts(mergeProduct.price, mergeProduct.quantity)
+  totalPriceProduct = priceMergeProducts(mergeProduct.price, mergeProduct.quantity);
 
   let section = document.querySelector('#cart__items');
   let article = document.createElement('article');
-  article.setAttribute('data-id', `${mergeProduct._id}`)
-  article.setAttribute('data-color', `${mergeProduct.color}`)
-  article.className = 'cart__item'
+  article.setAttribute('data-id', `${mergeProduct._id}`);
+  article.setAttribute('data-color', `${mergeProduct.color}`);
+  article.className = 'cart__item';
   section.appendChild(article);
 
   let divImg = document.createElement('div');
-  divImg.className = 'cart__item__img'
+  divImg.className = 'cart__item__img';
   article.appendChild(divImg);
 
   let image = document.createElement('img');
-  image.setAttribute("src", `${mergeProduct.imageUrl}`)
-  image.setAttribute("alt", `${mergeProduct.altTxt}`)
+  image.setAttribute("src", `${mergeProduct.imageUrl}`);
+  image.setAttribute("alt", `${mergeProduct.altTxt}`);
   divImg.appendChild(image);
 
   let divContent = document.createElement('div');
-  divContent.className = 'cart__item__content'
+  divContent.className = 'cart__item__content';
   article.appendChild(divContent);
 
   let divDescription = document.createElement('div');
-  divDescription.className = 'cart__item__content__description'
+  divDescription.className = 'cart__item__content__description';
   divContent.appendChild(divDescription);
 
   let title = document.createElement('h2');
-  title.textContent = `${mergeProduct.name}`
+  title.textContent = `${mergeProduct.name}`;
   divDescription.appendChild(title);
 
   let color = document.createElement('p');
-  color.textContent = `${mergeProduct.color}`
+  color.textContent = `${mergeProduct.color}`;
   divDescription.appendChild(color);
 
   let price = document.createElement('p');
-  price.textContent = `${totalPriceProduct}` + ',00 €'
+  price.textContent = `${totalPriceProduct}` + ',00 €';
   divDescription.appendChild(price);
 
   let divSettings = document.createElement('div');
-  divSettings.className = 'cart__item__content__settings'
+  divSettings.className = 'cart__item__content__settings';
   divContent.appendChild(divSettings);
 
   let divSettingsQuantity = document.createElement('div');
-  divSettingsQuantity.className = 'cart__item__content__settings__quantity'
+  divSettingsQuantity.className = 'cart__item__content__settings__quantity';
   divSettings.appendChild(divSettingsQuantity);
 
   let quantity = document.createElement('p');
-  quantity.textContent = 'Qté : '
+  quantity.textContent = 'Qté : ';
   divSettingsQuantity.appendChild(quantity);
 
   let inputQuantity = document.createElement('input');
-  inputQuantity.setAttribute('type', 'number')
-  inputQuantity.className = 'itemQuantity'
-  inputQuantity.setAttribute('name', 'itemQuantity')
-  inputQuantity.setAttribute('min', '1')
-  inputQuantity.setAttribute('max', '100')
-  inputQuantity.setAttribute('value', `${mergeProduct.quantity}`)
+  inputQuantity.setAttribute('type', 'number');
+  inputQuantity.className = 'itemQuantity';
+  inputQuantity.setAttribute('name', 'itemQuantity');
+  inputQuantity.setAttribute('min', '1');
+  inputQuantity.setAttribute('max', '100');
+  inputQuantity.setAttribute('value', `${mergeProduct.quantity}`);
   divSettingsQuantity.appendChild(inputQuantity);
 
   let divSettingsDelete = document.createElement('div');
@@ -97,43 +96,41 @@ function displayDataBasket(mergeProduct) {
   divSettings.appendChild(divSettingsDelete);
 
   let deleteButton = document.createElement('p');
-  deleteButton.className = 'deleteItem'
-  deleteButton.textContent = "Supprimer"
+  deleteButton.className = 'deleteItem';
+  deleteButton.textContent = "Supprimer";
   divSettingsDelete.appendChild(deleteButton);
 
   //Affichage du prix total de la commande
-  tablePrice.push(totalPriceProduct)
-  totalPrice(tablePrice)
-  document.getElementById('totalPrice').textContent = sumPrice
+  tablePrice.push(totalPriceProduct);
+  totalPrice(tablePrice);
+  document.getElementById('totalPrice').textContent = sumPrice;
 
 }
 
-//fonction pour fusionner la data et le panier du localStorage pris respectivement en paramètres 
-function totalQuantity(tables) {
-  let initialTotalQuantityValue = 0
-  let totalQuantityProducts = tables.reduce(
+//fonction pour calculer la quantité totale de tous les produits 
+function totalQuantity(tableQuantity) {
+  let initialTotalQuantityValue = 0;
+  let totalQuantityProducts = tableQuantity.reduce(
     (accumulator, currentValue) => accumulator + currentValue.quantity, initialTotalQuantityValue);
   document.getElementById('totalQuantity').textContent = totalQuantityProducts
 }
 
+//fonction pemettant de recalculer le prix total de tous les produits 
 function replaceTotalPrice() {
-  let tableRestPrice = []
-  let allPrice = document.querySelectorAll('.cart__item__content__description p:last-child')
-  console.log(allPrice)
+  let tableRestPrice = [];
+  let allPrice = document.querySelectorAll('.cart__item__content__description p:last-child');
 
   for (let i = 0; i < allPrice.length; i++) {
     let price = allPrice[i].textContent;
-    let intigerPrice = parseInt(price)
-    console.log(intigerPrice)
-    tableRestPrice.push(intigerPrice)
+    let intigerPrice = parseInt(price);
+    tableRestPrice.push(intigerPrice);
   }
-  console.log(tableRestPrice);
+
   totalPrice(tableRestPrice);
   document.getElementById('totalPrice').textContent = sumPrice;
 }
 
 // fonction du bouton pour supprimer les produits dans le panier et dans le DOM
-
 function deleteProduct() {
   let cartProduct = this.closest('.cart__item');
   let basket = getBasket();
@@ -141,8 +138,8 @@ function deleteProduct() {
   saveBasket(newBasket);
   cartProduct.remove();
   //modification de la quantité totale du panier dans le DOM
-  totalQuantity(newBasket)
-  replaceTotalPrice()
+  totalQuantity(newBasket);
+  replaceTotalPrice();
 
 }
 
@@ -150,14 +147,18 @@ function deleteProduct() {
 function upDateValues() {
 
   let inputValue = parseInt(this.closest('.itemQuantity').value);
-
-  if (inputValue == 0 || inputValue == undefined) {
+  if (inputValue <= 0 || inputValue > 100 || isNaN(inputValue)) {
     alert("Merci d'indiquer un nombre d'article(s) entre 1 et 100");
+    const cartProduct = this.closest('.cart__item');
+    let productElements = {
+      _id: cartProduct.dataset.id,
+      color: cartProduct.dataset.color,
+    }
+    let basket = getBasket();
+    let productBasket = basket.find(element => element._id === productElements._id && element.color === productElements.color);
+    this.closest('.itemQuantity').value = productBasket.quantity;
   }
 
-  if (inputValue > 100) {
-    alert("Merci d'indiquer un nombre d'articles inférieur à 100");
-  }
 
   else {
     let cartProduct = this.closest('.cart__item');
@@ -170,17 +171,17 @@ function upDateValues() {
     let basket = getBasket();
     let searchProduct = basket.find(element => element._id === newProduct._id && element.color === newProduct.color);
     //substitue le produit par l'index afin de conserver l'ordre des commandes
-    let indexProduct = basket.indexOf(searchProduct)
-    basket.splice(indexProduct, 1, newProduct)
+    let indexProduct = basket.indexOf(searchProduct);
+    basket.splice(indexProduct, 1, newProduct);
     saveBasket(basket);
     //modification du prix total dans le DOM
-    let productTab = tab.find(element => element._id === newProduct._id && element.color === newProduct.color)
-    let newTotalPrice = productTab.price * inputValue
+    let productTab = tableMergeProduct.find(element => element._id === newProduct._id && element.color === newProduct.color)
+    let newTotalPrice = productTab.price * inputValue;
     let price = cartProduct.querySelector('.cart__item__content__description p:last-child');
-    price.textContent = `${newTotalPrice}` + ',00 €'
+    price.textContent = `${newTotalPrice}` + ',00 €';
     //modification de la quantité totale du panier dans le DOM
     totalQuantity(basket);
-    replaceTotalPrice()
+    replaceTotalPrice();
 
   }
 }
@@ -191,7 +192,7 @@ function upDateValues() {
  * */
 
 let newTableBasket = getBasket()
-let tab = []
+let tableMergeProduct = []
 for (let products of newTableBasket) {
 
   fetch(`http://localhost:3000/api/products/${products._id}`)
@@ -199,11 +200,11 @@ for (let products of newTableBasket) {
     .then((data) => {
 
       let mergeProduct = mergeProducts(data, products);
-      tab.push(mergeProduct);
+      tableMergeProduct.push(mergeProduct);
 
       displayDataBasket(mergeProduct);
 
-      totalQuantity(tab);
+      totalQuantity(tableMergeProduct);
 
       //bouton pour supprimer les produits du panier
       let deleteButtons = document.querySelectorAll('article .deleteItem');
@@ -220,3 +221,5 @@ for (let products of newTableBasket) {
     })
 
 }
+
+

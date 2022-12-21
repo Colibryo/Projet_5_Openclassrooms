@@ -7,6 +7,7 @@ let id = params.get("idProduct");
 *intégre les produits avec leurs éléments dans le localStorage*/
 function setBasket(tableBasket) {
        localStorage.setItem('basket', JSON.stringify(tableBasket));
+       location.replace("../html/index.html");
 }
 
 /*fonction qui crée le panier dans le localStorage s'il n'existe pas 
@@ -33,7 +34,7 @@ function addProduct(ProductJson) {
        let tableBasket = getBasket();
        let searchProduct = tableBasket.find(element => element._id === ProductJson._id & element.color === colors.value);
 
-       if (searchProduct != undefined) {
+       if (searchProduct !== undefined) {
               // ajout du produit avec une quantité limitée à 100
               let newQuantity = parseInt(quantity.value) + parseInt(searchProduct.quantity)
               if (newQuantity <= 100) {
@@ -46,11 +47,15 @@ function addProduct(ProductJson) {
                      let indexProduct = tableBasket.indexOf(searchProduct)
                      tableBasket.splice(indexProduct, 1, newProduct)
                      setBasket(tableBasket);
+
+                
+
               }//sinon message si la quantité de 100 est dépassée 
               else {
                      alert("Vous dépassez la quantité maximale autorisée de 100 canapés! Merci de choisir une nouvelle quantité")
-              }
 
+              }
+              
        }
 
        else {
@@ -116,12 +121,12 @@ fetch(`http://localhost:3000/api/products/${id}`)
                             alert("Merci d'indiquer une couleur");
                      }
 
-                     else if (quantity.value == 0) {
+                     else if (quantity.value <= 0 || quantity.value >= 101) {
                             alert("Merci d'indiquer un nombre d'article(s) entre 1 et 100");
                      }
                      else {
                             addProduct(ProductJson)
-                            location.replace("http://127.0.0.1:5500/front/html/index.html")
+                           
                      }
               })
        })
