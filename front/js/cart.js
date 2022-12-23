@@ -222,4 +222,111 @@ for (let products of newTableBasket) {
 
 }
 
+let formOrder = document.querySelector('.cart__order__form');
 
+//vérification de la validité de la saisie du prénom dans le formulaire 
+formOrder.firstName.addEventListener('change', checkValidityFirstName);
+let firstnameInput = 0
+//Fonction pour vérifier la validité du champs "prénom" du formulaire
+function checkValidityFirstName() {
+  let dataInputFirstName = formOrder.firstName.value;
+  let regExpfirstName = /^[A-Z][a-z-àâäéèêëïîôöùûüÿç'.\s]{1,110}$/g;
+  let firstNameMsg = document.querySelector('#firstNameErrorMsg');
+
+  if (regExpfirstName.test(dataInputFirstName)) {
+    firstNameMsg.textContent = 'Prénom valide';
+    firstnameInput = true;
+  }
+  else {
+    firstNameMsg.textContent = 'Prénom invalide';
+    firstnameInput = false;
+  }
+
+}
+
+//vérification de la validité de la saisie du nom dans le formulaire
+formOrder.lastName.addEventListener('change', checkValidityName)
+let nameInput = 0
+//Fonction pour vérifier la validité du champs "nom" du formulaire
+function checkValidityName() {
+  let dataInputName = formOrder.lastName.value;
+  let regExpName = /^[A-Z'.\s]{1,110}$/g;
+  let nameMsg = document.querySelector('#lastNameErrorMsg')
+
+  if (regExpName.test(dataInputName)) {
+    nameMsg.textContent = 'Nom valide'
+    nameInput = true
+  }
+  else {
+    nameMsg.textContent = 'Nom invalide';
+    nameInput = false
+  }
+}
+
+//vérification de la validité de la saisie de l'adresse dans le formulaire
+formOrder.address.addEventListener('change', checkValidityAddress)
+let addressInput = 0;
+//Fonction pour vérifier la validité du champs "adresse" du formulaire
+function checkValidityAddress() {
+  let dataInputAddress = formOrder.address.value;
+  let regExpAddress = /^[a-zA-Z0-9àâäéèêëïîôöùûüÿç\s,'-]{1,100}$/g
+  let addressMsg = document.querySelector('#addressErrorMsg')
+
+  if (regExpAddress.test(dataInputAddress)) {
+    addressMsg.textContent = 'Adresse valide';
+    addressInput = true;
+  }
+  else {
+    addressMsg.textContent = 'Adresse non valide';
+    addressInput = false;
+  }
+}
+
+//vérification de la validité de la saisie des informations sur la ville dans le formulaire
+formOrder.city.addEventListener('change', checkValidityCity)
+let cityInput = 0
+//Fonction pour vérifier la validité du champs "ville" du formulaire et afficher un message en cas d'erreur
+function checkValidityCity() {
+  let dataInputCity = formOrder.city.value;
+  let regExpCity = /^[A-Z0-9,\s'-]{2,55}$/g
+  let cityMsg = document.querySelector('#cityErrorMsg')
+
+  if (regExpCity.test(dataInputCity)) {
+    cityMsg.textContent = 'Nom de ville valide';
+    cityInput = true;
+  }
+  else {
+    cityMsg.textContent = 'Nom de ville invalide';
+    cityInput = false;
+  }
+}
+
+//vérification de la validité de la saisie de l'email dans le formulaire
+formOrder.email.addEventListener('change', checkValidityEmail)
+//Fonction pour vérifier la validité du champs "email" du formulaire et afficher un message en cas d'erreur
+let emailInput = 0;
+function checkValidityEmail() {
+  let regExpEmail = /^[A-Za-z0-9._%+-]+[@]{1}[A-Za-z0-9.-_]+[.][a-z]{2,10}$/g
+  let dataInputEmail = formOrder.email.value;
+  let emailMsg = document.querySelector('#emailErrorMsg')
+
+  if (regExpEmail.test(dataInputEmail)) {
+    emailMsg.textContent = 'Adresse email valide';
+    emailInput = true;
+  }
+  else {
+    emailMsg.textContent = 'Adresse email invalide';
+    emailInput = false;
+  }
+}
+
+//vérification de la validité de tous les champs du formulaire au moment de cliquer sur le bouton commander
+document.querySelector('#order').addEventListener('click', (e) => {
+  if (firstnameInput === true && nameInput === true && addressInput === true && cityInput === true && emailInput === true) {
+    console.log(checkInputs)
+   
+  }
+  else{
+    e.preventDefault();
+  }
+})
