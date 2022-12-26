@@ -14,8 +14,8 @@ function priceMergeProducts(price, quantity) {
   return price *= quantity
 }
 //fonction pour fusionner la data et le panier du localStorage pris respectivement en paramètres  
-function mergeProducts(data, products) {
-  return Object.assign(data, products)
+function mergeProducts(data, productsCart) {
+  return Object.assign(data, productsCart)
 }
 
 //fonction permettant de calculer le total des prix totaux des produits récupérés dans un tableau
@@ -159,7 +159,6 @@ function upDateValues() {
     this.closest('.itemQuantity').value = productBasket.quantity;
   }
 
-
   else {
     let cartProduct = this.closest('.cart__item');
     // modification du panier
@@ -193,13 +192,13 @@ function upDateValues() {
 
 let newTableBasket = getBasket()
 let tableMergeProduct = []
-for (let products of newTableBasket) {
+for (let product of newTableBasket) {
 
-  fetch(`http://localhost:3000/api/products/${products._id}`)
+  fetch(`http://localhost:3000/api/products/${product._id}`)
     .then((response) => response.json())
     .then((data) => {
 
-      let mergeProduct = mergeProducts(data, products);
+      let mergeProduct = mergeProducts(data, product);
       tableMergeProduct.push(mergeProduct);
 
       displayDataBasket(mergeProduct);
@@ -217,7 +216,6 @@ for (let products of newTableBasket) {
       for (let inputQuantity of selectElements) {
         inputQuantity.addEventListener('change', upDateValues)
       }
-
     })
 
 }
@@ -226,20 +224,23 @@ let formOrder = document.querySelector('.cart__order__form');
 
 //vérification de la validité de la saisie du prénom dans le formulaire 
 formOrder.firstName.addEventListener('change', checkValidityFirstName);
-let firstnameInput = 0
+
+let firstNameInput = 0;
+
 //Fonction pour vérifier la validité du champs "prénom" du formulaire
-function checkValidityFirstName() {
+function checkValidityFirstName() { 
   let dataInputFirstName = formOrder.firstName.value;
   let regExpfirstName = /^[A-Z][a-z-àâäéèêëïîôöùûüÿç'.\s]{1,110}$/g;
   let firstNameMsg = document.querySelector('#firstNameErrorMsg');
 
   if (regExpfirstName.test(dataInputFirstName)) {
     firstNameMsg.textContent = 'Prénom valide';
-    firstnameInput = true;
+    firstNameInput = true;
+    
   }
   else {
     firstNameMsg.textContent = 'Prénom invalide';
-    firstnameInput = false;
+    firstNameInput = false;
   }
 
 }
@@ -247,6 +248,7 @@ function checkValidityFirstName() {
 //vérification de la validité de la saisie du nom dans le formulaire
 formOrder.lastName.addEventListener('change', checkValidityName)
 let nameInput = 0
+ 
 //Fonction pour vérifier la validité du champs "nom" du formulaire
 function checkValidityName() {
   let dataInputName = formOrder.lastName.value;
@@ -256,13 +258,14 @@ function checkValidityName() {
   if (regExpName.test(dataInputName)) {
     nameMsg.textContent = 'Nom valide'
     nameInput = true
+     
   }
   else {
     nameMsg.textContent = 'Nom invalide';
     nameInput = false
   }
 }
-
+ 
 //vérification de la validité de la saisie de l'adresse dans le formulaire
 formOrder.address.addEventListener('change', checkValidityAddress)
 let addressInput = 0;
@@ -294,6 +297,7 @@ function checkValidityCity() {
   if (regExpCity.test(dataInputCity)) {
     cityMsg.textContent = 'Nom de ville valide';
     cityInput = true;
+
   }
   else {
     cityMsg.textContent = 'Nom de ville invalide';
@@ -313,20 +317,66 @@ function checkValidityEmail() {
   if (regExpEmail.test(dataInputEmail)) {
     emailMsg.textContent = 'Adresse email valide';
     emailInput = true;
+
   }
+
   else {
     emailMsg.textContent = 'Adresse email invalide';
     emailInput = false;
   }
 }
 
-//vérification de la validité de tous les champs du formulaire au moment de cliquer sur le bouton commander
-document.querySelector('#order').addEventListener('click', (e) => {
-  if (firstnameInput === true && nameInput === true && addressInput === true && cityInput === true && emailInput === true) {
-    console.log(checkInputs)
-   
+function sendOrder(){
+let contact = {
+  firstName: firstName.value,
+  lastName: lastName.value,
+  address: address.value,
+  city: city.value,
+  email: email.value
+}
+let tabBasket = getBasket()
+console.log(products)
+let products = tabBasket.map(elements => elements._id);
+console.log(products)
+const order = {
+  contact,
+  products,
+}
+
+fetch('http://localhost:3000/api/products/order', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+  body: JSON.stringify(order),
+})
+
+.then(response => {
+  if (response.ok) {
+
+         return response.json();
+         console.log(response)
   }
-  else{
-    e.preventDefault();
+  throw new Error('Erreur serveur');
+
+})
+.then(data => {
+   
+    console.log(data)
+    
+  })
+
+}
+//Envoi de la commande 
+const form = document.querySelector('.cart__order__form')
+form.addEventListener('submit', (e) => {
+   if (firstNameInput === true && nameInput === true && addressInput === true && cityInput === true && emailInput === true) {
+    sendOrder()
+
+ }
+    else {
+     e.preventDefault();
+
   }
 })
