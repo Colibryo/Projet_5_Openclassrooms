@@ -230,7 +230,7 @@ let firstNameInput = 0;
 //Fonction pour vérifier la validité du champs "prénom" du formulaire
 function checkValidityFirstName() { 
   let dataInputFirstName = formOrder.firstName.value;
-  let regExpfirstName = /^[A-Z][a-z-àâäéèêëïîôöùûüÿç'.\s]{1,110}$/g;
+  let regExpfirstName = /^[A-Z][a-zàâäéèêëïîôöùûüÿç]{1,30}$|^[A-Z][a-zàâäéèêëïîôöùûüÿç]{1,30}[\s-]{0,1}[A-Z][a-zàâäéèêëïîôöùûüÿç]{1,30}$/g;
   let firstNameMsg = document.querySelector('#firstNameErrorMsg');
 
   if (regExpfirstName.test(dataInputFirstName)) {
@@ -252,7 +252,7 @@ let nameInput = 0
 //Fonction pour vérifier la validité du champs "nom" du formulaire
 function checkValidityName() {
   let dataInputName = formOrder.lastName.value;
-  let regExpName = /^[A-Z'.\s]{1,110}$/g;
+  let regExpName = /^[A-Z'\s]{1,110}$/g;
   let nameMsg = document.querySelector('#lastNameErrorMsg')
 
   if (regExpName.test(dataInputName)) {
@@ -326,7 +326,7 @@ function checkValidityEmail() {
   }
 }
 
-function sendOrder(){
+ function sendOrder(){
 let contact = {
   firstName: firstName.value,
   lastName: lastName.value,
@@ -335,13 +335,11 @@ let contact = {
   email: email.value
 }
 let tabBasket = getBasket()
-console.log(products)
+
 let products = tabBasket.map(elements => elements._id);
 console.log(products)
-const order = {
-  contact,
-  products,
-}
+
+ 
 
 fetch('http://localhost:3000/api/products/order', {
   method: 'POST',
@@ -349,34 +347,41 @@ fetch('http://localhost:3000/api/products/order', {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  body: JSON.stringify(order),
+  body: JSON.stringify({contact, products}),
 })
 
 .then(response => {
-  if (response.ok) {
+  if (response) {
 
          return response.json();
-         console.log(response)
+          
   }
   throw new Error('Erreur serveur');
 
 })
 .then(data => {
    
-    console.log(data)
+    let dataOrderId = data.orderId
+    
+
+    window.location.replace(`./confirmation.html?orderId=${dataOrderId}`);
     
   })
 
-}
+} 
 //Envoi de la commande 
 const form = document.querySelector('.cart__order__form')
 form.addEventListener('submit', (e) => {
+  e.preventDefault();
    if (firstNameInput === true && nameInput === true && addressInput === true && cityInput === true && emailInput === true) {
-    sendOrder()
-
- }
-    else {
-     e.preventDefault();
+      
+    sendOrder();
 
   }
+    else {
+   alert("Des champs du formulaire n'ont pas été correctement renseignés, veuillez rectifier.");
+
+   }  
+ 
 })
+ 
