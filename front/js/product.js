@@ -7,6 +7,7 @@ let id = params.get("idProduct");
 *intégre les produits avec leurs éléments dans le localStorage*/
 function setBasket(tableBasket) {
        localStorage.setItem('basket', JSON.stringify(tableBasket));
+       alert('Le produit a été ajouté au panier.')
        location.replace("../html/index.html");
 }
 
@@ -39,6 +40,7 @@ function addProduct(ProductJson) {
               let newQuantity = parseInt(quantity.value) + parseInt(searchProduct.quantity)
               if (newQuantity <= 100) {
                      let newProduct = {
+                            nameProduct: ProductJson.name,
                             _id: ProductJson._id,
                             color: colors.value,
                             quantity: parseInt(newQuantity)
@@ -46,31 +48,32 @@ function addProduct(ProductJson) {
                      //substitue le produit par l'index afin de conserver l'ordre des commandes
                      let indexProduct = tableBasket.indexOf(searchProduct)
                      tableBasket.splice(indexProduct, 1, newProduct)
-                     setBasket(tableBasket);
-
-                
 
               }//sinon message si la quantité de 100 est dépassée 
               else {
                      alert("Vous dépassez la quantité maximale autorisée de 100 canapés! Merci de choisir une nouvelle quantité")
 
               }
-              
+
        }
 
        else {
               const productBasket = {
+                     nameProduct: ProductJson.name,
                      _id: ProductJson._id,
                      color: colors.value,
                      quantity: parseInt(quantity.value)
               }
 
               tableBasket.push(productBasket);
-              setBasket(tableBasket);
+
        }
+
+       setBasket(tableBasket);
+
 }
 
-/**requête pour obtenir les données json de tous les produits avec l'id récupéré
+/**requête pour obtenir les données json du produit avec l'id récupéré
  * la promesse retournée prend en paramètres le résultat pour déterminer son format
  * retourne le résultat en cas de succès ou indique un message d'erreur*/
 fetch(`http://localhost:3000/api/products/${id}`)
@@ -109,7 +112,7 @@ fetch(`http://localhost:3000/api/products/${id}`)
 
               }
 
-              /*fonction pour ajouter le ou les produits au panier en cliquant sur le bouton, avec
+              /*fonction pour ajouter le ou les produits au panier en cliquant sur le bouton "ajouter au panier", avec
               messages à l'utilisateur si la couleur et la quantité sont mal renseignées*/
               const button = document.querySelector('#addToCart');
               button.addEventListener('click', () => {
@@ -118,15 +121,15 @@ fetch(`http://localhost:3000/api/products/${id}`)
                      let firstOption = selectElem.selectedIndex;
 
                      if (colors.value == firstOption) {
-                            alert("Merci d'indiquer une couleur");
+                            alert("Vous devez indiquer une couleur");
                      }
 
                      else if (quantity.value <= 0 || quantity.value >= 101) {
-                            alert("Merci d'indiquer un nombre d'article(s) entre 1 et 100");
+                            alert("Vous devez indiquer un nombre d'article(s) entre 1 et 100");
                      }
                      else {
                             addProduct(ProductJson)
-                           
+
                      }
               })
        })

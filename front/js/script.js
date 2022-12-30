@@ -18,20 +18,20 @@ fetch("http://localhost:3000/api/products")
                      let anchorProducts = document.createElement('a');
                      anchorProducts.setAttribute('href', `./product.html?idProduct=${jsonProduct._id}`);
                      section.appendChild(anchorProducts);
-                     
+
                      let article = document.createElement('article');
                      anchorProducts.appendChild(article);
-                     
+
                      let image = document.createElement('img');
                      image.setAttribute("src", `${jsonProduct.imageUrl}`)
                      image.setAttribute("alt", `${jsonProduct.altTxt}`)
                      article.appendChild(image);
-                     
+
                      let title = document.createElement('h3');
                      title.textContent = `${jsonProduct.name}`
                      article.appendChild(title);
                      title.className = 'productName'
-                     
+
                      let description = document.createElement('p');
                      description.textContent = `${jsonProduct.description}`
                      article.appendChild(description);

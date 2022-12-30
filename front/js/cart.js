@@ -18,7 +18,7 @@ function mergeProducts(data, productsCart) {
   return Object.assign(data, productsCart)
 }
 
-//fonction permettant de calculer le total des prix totaux des produits récupérés dans un tableau
+//fonction permettant de calculer le total des prix totaux des produits récupérés dans un tableau pris en paramètres
 let sumPrice = 0
 function totalPrice(tablePrice) {
   let initialValue = 0;
@@ -59,7 +59,7 @@ function displayDataBasket(mergeProduct) {
   divContent.appendChild(divDescription);
 
   let title = document.createElement('h2');
-  title.textContent = `${mergeProduct.name}`;
+  title.textContent = `${mergeProduct.nameProduct}`;
   divDescription.appendChild(title);
 
   let color = document.createElement('p');
@@ -107,7 +107,7 @@ function displayDataBasket(mergeProduct) {
 
 }
 
-//fonction pour calculer la quantité totale de tous les produits 
+//fonction pour calculer la quantité totale de tous les produits en prenant leurs quantités en paramètre 
 function totalQuantity(tableQuantity) {
   let initialTotalQuantityValue = 0;
   let totalQuantityProducts = tableQuantity.reduce(
@@ -130,7 +130,7 @@ function replaceTotalPrice() {
   document.getElementById('totalPrice').textContent = sumPrice;
 }
 
-// fonction du bouton pour supprimer les produits dans le panier et dans le DOM
+// fonction du bouton permettant de supprimer les produits dans le panier et dans le DOM
 function deleteProduct() {
   let cartProduct = this.closest('.cart__item');
   let basket = getBasket();
@@ -143,10 +143,11 @@ function deleteProduct() {
 
 }
 
-//fonction du bouton pour changer la quantité et le prix total d'un produit
+//fonction du bouton permettant de changer la quantité et le prix total d'un produit
 function upDateValues() {
 
   let inputValue = parseInt(this.closest('.itemQuantity').value);
+  //message en cas d'erreur de saisie puis remet la quantité initialement commandée
   if (inputValue <= 0 || inputValue > 100 || isNaN(inputValue)) {
     alert("Merci d'indiquer un nombre d'article(s) entre 1 et 100");
     const cartProduct = this.closest('.cart__item');
@@ -157,19 +158,21 @@ function upDateValues() {
     let basket = getBasket();
     let productBasket = basket.find(element => element._id === productElements._id && element.color === productElements.color);
     this.closest('.itemQuantity').value = productBasket.quantity;
-  }
 
+  }
+  //modification du produit dans le localstorage et dans la page lors du changement de la quantité
   else {
     let cartProduct = this.closest('.cart__item');
-    // modification du panier
+    let basket = getBasket();
+    let searchProduct = basket.find(element => element._id === cartProduct.dataset.id && element.color === cartProduct.dataset.color);
+    //substitue le produit par l'index afin de conserver l'ordre des commandes
     let newProduct = {
-      _id: cartProduct.dataset.id,
-      color: cartProduct.dataset.color,
+      nameProduct: searchProduct.nameProduct,
+      _id: searchProduct._id,
+      color: searchProduct.color,
       quantity: inputValue
     }
-    let basket = getBasket();
-    let searchProduct = basket.find(element => element._id === newProduct._id && element.color === newProduct.color);
-    //substitue le produit par l'index afin de conserver l'ordre des commandes
+
     let indexProduct = basket.indexOf(searchProduct);
     basket.splice(indexProduct, 1, newProduct);
     saveBasket(basket);
@@ -181,28 +184,33 @@ function upDateValues() {
     //modification de la quantité totale du panier dans le DOM
     totalQuantity(basket);
     replaceTotalPrice();
-
   }
 }
 
 /* *récupération des produits correspondant au localStorage dans le serveur 
 *Affichage  tous les produits et leurs éléments
  * affichage de la quantité total des produits
+ * Et boutons permettant soit de supprimer les produits soit de changer leur quantité
  * */
 
 let newTableBasket = getBasket()
 let tableMergeProduct = []
+
 for (let product of newTableBasket) {
 
   fetch(`http://localhost:3000/api/products/${product._id}`)
-    .then((response) => response.json())
+    .then(response => {
+      if (response) {
+
+        return response.json();
+      }
+      throw new Error('Erreur serveur');
+    })
     .then((data) => {
 
       let mergeProduct = mergeProducts(data, product);
       tableMergeProduct.push(mergeProduct);
-
       displayDataBasket(mergeProduct);
-
       totalQuantity(tableMergeProduct);
 
       //bouton pour supprimer les produits du panier
@@ -211,7 +219,7 @@ for (let product of newTableBasket) {
         deleteButton.addEventListener('click', deleteProduct)
       }
 
-      //Changement des prix des produits avec le sélecteur
+      //Changement des prix des produits
       let selectElements = document.querySelectorAll('article input');
       for (let inputQuantity of selectElements) {
         inputQuantity.addEventListener('change', upDateValues)
@@ -228,18 +236,18 @@ formOrder.firstName.addEventListener('change', checkValidityFirstName);
 let firstNameInput = 0;
 
 //Fonction pour vérifier la validité du champs "prénom" du formulaire
-function checkValidityFirstName() { 
+function checkValidityFirstName() {
   let dataInputFirstName = formOrder.firstName.value;
-  let regExpfirstName = /^[A-Z][a-zàâäéèêëïîôöùûüÿç]{1,30}$|^[A-Z][a-zàâäéèêëïîôöùûüÿç]{1,30}[\s-]{0,1}[A-Z][a-zàâäéèêëïîôöùûüÿç]{1,30}$/g;
+  let regExpfirstName = /^[A-Z][a-zàâäéèêëïîôöùûüÿç]{1,50}$|^[A-Z][a-zàâäéèêëïîôöùûüÿç]{1,50}[\s-]{0,1}[A-Z][a-zàâäéèêëïîôöùûüÿç]{1,50}$/g;
   let firstNameMsg = document.querySelector('#firstNameErrorMsg');
 
   if (regExpfirstName.test(dataInputFirstName)) {
     firstNameMsg.textContent = 'Prénom valide';
     firstNameInput = true;
-    
+
   }
   else {
-    firstNameMsg.textContent = 'Prénom invalide';
+    firstNameMsg.textContent = "Prénom invalide, il doit comporter une majuscule puis des minuscules, un espace ou un tiret '-'";
     firstNameInput = false;
   }
 
@@ -248,24 +256,24 @@ function checkValidityFirstName() {
 //vérification de la validité de la saisie du nom dans le formulaire
 formOrder.lastName.addEventListener('change', checkValidityName)
 let nameInput = 0
- 
+
 //Fonction pour vérifier la validité du champs "nom" du formulaire
 function checkValidityName() {
   let dataInputName = formOrder.lastName.value;
-  let regExpName = /^[A-Z'\s]{1,110}$/g;
+  let regExpName = /^[A-Z'\s]{1,100}$/g;
   let nameMsg = document.querySelector('#lastNameErrorMsg')
 
   if (regExpName.test(dataInputName)) {
     nameMsg.textContent = 'Nom valide'
     nameInput = true
-     
+
   }
   else {
-    nameMsg.textContent = 'Nom invalide';
+    nameMsg.textContent = 'Nom invalide, il ne doit comporter que des lettres majuscules avec un espace';
     nameInput = false
   }
 }
- 
+
 //vérification de la validité de la saisie de l'adresse dans le formulaire
 formOrder.address.addEventListener('change', checkValidityAddress)
 let addressInput = 0;
@@ -280,7 +288,7 @@ function checkValidityAddress() {
     addressInput = true;
   }
   else {
-    addressMsg.textContent = 'Adresse non valide';
+    addressMsg.textContent = 'Adresse non valide, elle ne doit pas comporter de caractères spéciaux';
     addressInput = false;
   }
 }
@@ -291,7 +299,7 @@ let cityInput = 0
 //Fonction pour vérifier la validité du champs "ville" du formulaire et afficher un message en cas d'erreur
 function checkValidityCity() {
   let dataInputCity = formOrder.city.value;
-  let regExpCity = /^[A-Z0-9,\s'-]{2,55}$/g
+  let regExpCity = /^[A-Z,\s'-]{1,50}$/g
   let cityMsg = document.querySelector('#cityErrorMsg')
 
   if (regExpCity.test(dataInputCity)) {
@@ -300,7 +308,7 @@ function checkValidityCity() {
 
   }
   else {
-    cityMsg.textContent = 'Nom de ville invalide';
+    cityMsg.textContent = 'Nom de ville invalide, il doit comporter : des lettres majuscules, un espaces ou un tiret "-"';
     cityInput = false;
   }
 }
@@ -310,7 +318,7 @@ formOrder.email.addEventListener('change', checkValidityEmail)
 //Fonction pour vérifier la validité du champs "email" du formulaire et afficher un message en cas d'erreur
 let emailInput = 0;
 function checkValidityEmail() {
-  let regExpEmail = /^[A-Za-z0-9._%+-]+[@]{1}[A-Za-z0-9.-_]+[.][a-z]{2,10}$/g
+  let regExpEmail = /^[A-Za-z0-9._%+-]+[@]{1}[A-Za-z0-9.-_]{2,}[.][a-z]{2,10}$/g
   let dataInputEmail = formOrder.email.value;
   let emailMsg = document.querySelector('#emailErrorMsg')
 
@@ -321,67 +329,71 @@ function checkValidityEmail() {
   }
 
   else {
-    emailMsg.textContent = 'Adresse email invalide';
+    emailMsg.textContent = 'Adresse email invalide (exemple de mail valide : exemple@exemple.exemple)';
     emailInput = false;
   }
 }
 
- function sendOrder(){
-let contact = {
-  firstName: firstName.value,
-  lastName: lastName.value,
-  address: address.value,
-  city: city.value,
-  email: email.value
-}
-let tabBasket = getBasket()
-
-let products = tabBasket.map(elements => elements._id);
-console.log(products)
-
- 
-
-fetch('http://localhost:3000/api/products/order', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  },
-  body: JSON.stringify({contact, products}),
-})
-
-.then(response => {
-  if (response) {
-
-         return response.json();
-          
+/*fonction pour consituer l'objet contenant le formulaire et l'id 
+à envoyer au serveur pour obtenir le numéro de la commande */
+function sendOrder() {
+  let contact = {
+    firstName: firstName.value,
+    lastName: lastName.value,
+    address: address.value,
+    city: city.value,
+    email: email.value
   }
-  throw new Error('Erreur serveur');
+  let tabBasket = getBasket()
 
-})
-.then(data => {
-   
-    let dataOrderId = data.orderId
-    
+  let products = tabBasket.map(elements => elements._id);
 
-    window.location.replace(`./confirmation.html?orderId=${dataOrderId}`);
-    
+  /*envoi de l'objet au serveur, récupération du numéro de commande 
+  et redirection vers la page confirmation de la commande*/
+  fetch('http://localhost:3000/api/products/order', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify({ contact, products }),
   })
 
-} 
-//Envoi de la commande 
+    .then(response => {
+      if (response) {
+
+        return response.json();
+
+      }
+      throw new Error('Erreur serveur');
+
+    })
+    .then(data => {
+
+      let dataOrderId = data.orderId
+
+      window.location.replace(`./confirmation.html?orderId=${dataOrderId}`);
+
+    })
+
+}
+//Envoi de la commande avec le bouton "commander" si le formulaire est valide et si le panier n'est pas vide
 const form = document.querySelector('.cart__order__form')
+
 form.addEventListener('submit', (e) => {
+
   e.preventDefault();
-   if (firstNameInput === true && nameInput === true && addressInput === true && cityInput === true && emailInput === true) {
-      
-    sendOrder();
+  let tableBasket = getBasket()
+  tableBasket[0] !== undefined
+
+  if (tableBasket[0] !== undefined && firstNameInput === true && nameInput === true && addressInput === true && cityInput === true && emailInput === true) {
+
+    sendOrder()
+  }
+
+  else {
+    alert("Votre panier est vide ou le formulaire de commande n'a pas été correctement renseigné, merci de bien vouloir compléter votre panier et/ou rectifier les champs saisis.")
 
   }
-    else {
-   alert("Des champs du formulaire n'ont pas été correctement renseignés, veuillez rectifier.");
 
-   }  
- 
 })
- 
