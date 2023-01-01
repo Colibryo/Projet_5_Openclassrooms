@@ -48,7 +48,7 @@ function addProduct(ProductJson) {
                      //substitue le produit par l'index afin de conserver l'ordre des commandes
                      let indexProduct = tableBasket.indexOf(searchProduct)
                      tableBasket.splice(indexProduct, 1, newProduct)
-
+                     setBasket(tableBasket);
               }//sinon message si la quantité de 100 est dépassée 
               else {
                      alert("Vous dépassez la quantité maximale autorisée de 100 canapés! Merci de choisir une nouvelle quantité")
@@ -66,10 +66,11 @@ function addProduct(ProductJson) {
               }
 
               tableBasket.push(productBasket);
+              setBasket(tableBasket);
 
        }
 
-       setBasket(tableBasket);
+        
 
 }
 
